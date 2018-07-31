@@ -1,49 +1,124 @@
 <template>
   <div id="wrapper">
-    <img id="logo" src="~@/assets/logo.png" alt="electron-vue">
+    <div class="tab-group">
+      <div class="tab-item" :key="index" v-for="(item, index) in tabList">
+        {{ index }}
+        <span class="icon icon-cancel icon-close-tab" @click="deleteTable(index)"></span>
+      </div>
+      <div class="tab-item tab-item-fixed" @click="addTable">
+        <span class="icon icon-plus"></span>
+      </div>
+      <div class="tab-item tab-item-fixed">
+        <span class="icon icon-menu"></span>
+      </div>
+    </div>
     <main>
-      <div class="left-side">
-        <span class="title">
-          Welcome to your new project!
+      <nav class="nav-group">
+        <h5 class="nav-group-title">Favorites</h5>
+        <a class="nav-group-item active">
+          <span class="icon icon-home"></span>
+          connors
+        </a>
+        <span class="nav-group-item">
+          <span class="icon icon-download"></span>
+          Downloads
         </span>
-        <system-information></system-information>
-      </div>
-
-      <div class="right-side">
-        <div class="doc">
-          <div class="title">Getting Started</div>
-          <p>
-            electron-vue comes packed with detailed documentation that covers everything from
-            internal configurations, using the project structure, building your application,
-            and so much more.
-          </p>
-          <button @click="open('https://simulatedgreg.gitbooks.io/electron-vue/content/')">Read the Docs</button><br><br>
+        <span class="nav-group-item">
+          <span class="icon icon-folder"></span>
+          Documents
+        </span>
+        <span class="nav-group-item">
+          <span class="icon icon-signal"></span>
+          AirPlay
+        </span>
+        <span class="nav-group-item">
+          <span class="icon icon-print"></span>
+          Applications
+        </span>
+        <span class="nav-group-item">
+          <span class="icon icon-cloud"></span>
+          Desktop
+        </span>
+      </nav>
+      <div class="container">
+        <div class="container-box" :key="index" v-for="(item, index) in tabList">
+          <div class="content-box" :key="tab" v-for="(item, tab) in item">
+            <p>{{ tab }}</p>
+          </div>
         </div>
-        <div class="doc">
-          <div class="title alt">Other Documentation</div>
-          <button class="alt" @click="open('https://electron.atom.io/docs/')">Electron</button>
-          <button class="alt" @click="open('https://vuejs.org/v2/guide/')">Vue.js</button>
-        </div>
       </div>
+      <webview id="foo" src="https://www.github.com/" style="display:inline-block; width:1240px; height:480px"></webview>
     </main>
   </div>
 </template>
 
 <script>
   import SystemInformation from './LandingPage/SystemInformation'
-
+  import TabGroup from 'electron-tabs';
   export default {
     name: 'landing-page',
     components: { SystemInformation },
+    data() {
+      return {
+        tabList: [
+          [
+            'tab1',
+            'tab2',
+            'tab3'
+          ],
+          [
+            'tab1',
+            'tab2',
+            'tab3'            
+          ]
+        ],
+      };
+    },
+    created() {
+      // this.getGroup();
+    },
+    mounted() {
+      // this.getGroup();
+    },
     methods: {
+      deleteTable(index) {
+        this.tabList.splice(index, 1);
+      },
+      addTable() {
+        this.tabList.push(          
+          [
+            'tab1',
+            'tab2',
+            'tab3'            
+          ]
+        );
+      },
       open (link) {
         this.$electron.shell.openExternal(link)
+      },
+      getGroup() {
+        let tabGroup = new TabGroup({
+          newTab: {
+              title: 'New Tab'
+          }
+        });
+        tabGroup.addTab({
+            title: 'Google',
+            src: '/',
+        });
+        tabGroup.addTab({
+            title: "Electron",
+            src: "/",
+            visible: true,
+            active: true
+        });
       }
     }
   }
 </script>
 
 <style>
+  /* @import './test.css'; */
   @import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro');
 
   * {
@@ -62,7 +137,7 @@
         rgba(229, 229, 229, .9) 100%
       );
     height: 100vh;
-    padding: 60px 80px;
+    /* padding: 60px 80px; */
     width: 100vw;
   }
 
@@ -77,7 +152,7 @@
     justify-content: space-between;
   }
 
-  main > div { flex-basis: 50%; }
+  /* main > div { flex-basis: 50%; } */
 
   .left-side {
     display: flex;
@@ -124,5 +199,24 @@
   .doc button.alt {
     color: #42b983;
     background-color: transparent;
+  }
+
+  /*
+  * 中间内容区域样式
+  */
+  .container {
+    width: 100%;
+    margin: 0 auto;
+  }
+  .container-box {
+    width: 100%;
+    display: flex;
+  }
+  .content-box {
+    flex: 1;
+    margin: 10px;
+    position: relative;
+    border: 1px solid #dedddd;
+    box-shadow: 0px 0px 10px #dedddd;
   }
 </style>
