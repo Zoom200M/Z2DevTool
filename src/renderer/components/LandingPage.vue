@@ -8,7 +8,7 @@
       <div class="tab-item tab-item-fixed" @click="addTable">
         <span class="icon icon-plus"></span>
       </div>
-      <div class="tab-item tab-item-fixed">
+      <div class="tab-item tab-item-fixed" @click="popupAppMenu">
         <span class="icon icon-menu"></span>
       </div>
     </div>
@@ -53,7 +53,8 @@
 </template>
 
 <script>
-  import SystemInformation from './LandingPage/SystemInformation'
+  import { BrowserWindow } from 'electron';
+  import SystemInformation from './LandingPage/SystemInformation';
   import TabGroup from 'electron-tabs';
   export default {
     name: 'landing-page',
@@ -72,6 +73,13 @@
             'tab3'            
           ]
         ],
+        template: [
+          { label: '设置', selector: 'orderFrontStandardAboutPanel:' },
+          { type: 'separator' },
+          { label: '关于', selector: 'orderFrontStandardAboutPanel:' },
+          { type: 'separator' },
+          { label: '退出', accelerator: 'Command+Q', click: function () { const app = require('electron').remote.app; app.quit(); } }
+        ],
       };
     },
     created() {
@@ -82,9 +90,18 @@
     },
     methods: {
       deleteTable(index) {
+        console.log('deleteTable');
         this.tabList.splice(index, 1);
       },
+      popupAppMenu() {
+        // console.log('popupAppMenu');
+        const Menu = require('electron').remote.Menu;
+        const menu = Menu.buildFromTemplate(this.template);
+        // menu.append(new MenuItem({label: 'hello'}));
+        menu.popup();
+      },
       addTable() {
+        console.log('addTable');
         this.tabList.push(          
           [
             'tab1',
