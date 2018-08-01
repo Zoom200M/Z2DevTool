@@ -158,9 +158,11 @@ mb.on('show', function show () {
 const template = [{
   label: 'Temps',
   submenu: [
-    { label: 'About Temps', selector: 'orderFrontStandardAboutPanel:' },
+    { label: '关于', selector: 'orderFrontStandardAboutPanel:' },
+    { label: '检查更新', selector: 'orderFrontStandardAboutPanel:' },
+    { label: '偏好设置', accelerator: 'Command+,', selector: 'orderFrontStandardAboutPanel:' },
     { type: 'separator' },
-    { label: 'Quit', accelerator: 'Command+Q', click: function () { app.quit() } }
+    { label: '退出', accelerator: 'Command+Q', click: function () { app.quit() } }
   ]},
   {
     label: 'Edit',

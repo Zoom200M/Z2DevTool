@@ -53,7 +53,7 @@
 </template>
 
 <script>
-  import { BrowserWindow } from 'electron';
+  import { remote } from 'electron';
   import SystemInformation from './LandingPage/SystemInformation';
   import TabGroup from 'electron-tabs';
   export default {
@@ -73,12 +73,12 @@
             'tab3'            
           ]
         ],
-        template: [
-          { label: '设置', selector: 'orderFrontStandardAboutPanel:' },
+        menuTemplate: [
+          { label: '设置', accelerator: 'Command+,', selector: 'orderFrontStandardAboutPanel:' },
           { type: 'separator' },
           { label: '关于', selector: 'orderFrontStandardAboutPanel:' },
           { type: 'separator' },
-          { label: '退出', accelerator: 'Command+Q', click: function () { const app = require('electron').remote.app; app.quit(); } }
+          { label: '退出', accelerator: 'Command+Q', click: () => { remote.app.quit(); } }
         ],
       };
     },
@@ -94,10 +94,7 @@
         this.tabList.splice(index, 1);
       },
       popupAppMenu() {
-        // console.log('popupAppMenu');
-        const Menu = require('electron').remote.Menu;
-        const menu = Menu.buildFromTemplate(this.template);
-        // menu.append(new MenuItem({label: 'hello'}));
+        const menu = remote.Menu.buildFromTemplate(this.menuTemplate);
         menu.popup();
       },
       addTable() {
