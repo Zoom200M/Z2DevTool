@@ -1,0 +1,24 @@
+{
+  "current_tabs": [
+    "pages.daily",
+    "pages.json"
+  ],
+  "categories": {
+    "pages": {
+      "daily": {
+        "type": "remote",
+        "url": "http://daily.staff.weibo.cn/index.html"
+      },
+      "json": {
+        "type": "local",
+        "url": "index"
+      }
+    },
+    "tools": {
+      "md5": {
+        "type": "local",
+        "url": "index"
+      }
+    }
+  }
+}
