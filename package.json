@@ -53,6 +53,7 @@
   "dependencies": {
     "axios": "^0.16.1",
     "electron-photon": "^1.1.6",
+    "electron-store": "^2.0.0",
     "electron-tabs": "^0.9.2",
     "menubar": "^5.2.3",
     "path": "^0.12.7",
