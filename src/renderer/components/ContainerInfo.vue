@@ -1,50 +1,18 @@
+
 <template>
-  <div id="app" class="wrapper">
-    <div class="tab-group">
-      <div class="tab-item tab-item-fixed"
-        @click.stop.prevent="$router.push({ path: '/' })">
-        <span class="icon icon-home"></span>
-      </div>
-      <div class="tab-item" :key="index" v-for="(item, index) in currentTabs">
-        {{ item.split('.')[1] }}
-        <span class="icon icon-cancel icon-close-tab" @click="deleteTable(index)"></span>
-      </div>
-      <div class="tab-item tab-item-fixed" @click="addTable">
-        <span class="icon icon-plus"></span>
-      </div>
-      <div class="tab-item tab-item-fixed" @click="popupAppMenu">
-        <span class="icon icon-menu"></span>
-      </div>
-    </div>
-    <main>
-      <nav class="nav-group">
-        <!-- <h5 class="nav-group-title">Favorites</h5>
-        <a class="nav-group-item active" 
-          @click.stop.prevent="$router.push({ path: '/' })">
-          <span class="icon icon-home"></span>
-          connors
-        </a> -->
-        <span class="nav-group-item" v-for="(item, index) in categories" :key="index">
-          <span class="icon icon-cloud"></span>
-          {{ item }}
-        </span>
-      </nav>
-      <router-view></router-view>
-    </main>
+  <div class="container">
+    <webview id="foo" src="https://www.github.com/" style="display:inline-block; width:1240px; height:480px"></webview>
   </div>
 </template>
 
 <script>
   import { remote } from 'electron';
   import TabGroup from 'electron-tabs';
-  import Store from 'electron-store';
-  // import { constants } from 'http2';
   export default {
-    name: 'z2devtool',
+    name: 'container-info',
+    // components: { SystemInformation },
     data() {
       return {
-        currentTabs: [],
-        categories: [],
         tabList: [
           'tab1',
           'tab2',
@@ -63,23 +31,12 @@
       };
     },
     created() {
-      this.getInitialData();
+      // this.getGroup();
+    },
+    mounted() {
+      // this.getGroup();
     },
     methods: {
-      getInitialData() {
-        const store = new Store();
-        const current_tabs = store.get('current_tabs');
-        this.currentTabs = current_tabs ? current_tabs : [];
-        const categoriesStore = store.get('categories');
-        for (let i in categoriesStore) {
-          this.categories.push(i);
-        }
-        // console.log(store.get('categories'));
-        // store.get('categories').map((item) => {
-        //   this.categories.push(item);
-        // })
-        // console.log(this.categories);
-      },
       deleteTable(index) {
         console.log('deleteTable');
         this.tabList.splice(index, 1);
@@ -90,15 +47,40 @@
       },
       addTable() {
         console.log('addTable');
-        this.tabList.push('tab5');
+        this.tabList.push(          
+          [
+            'tab1',
+            'tab2',
+            'tab3'            
+          ]
+        );
       },
+      open (link) {
+        this.$electron.shell.openExternal(link)
+      },
+      getGroup() {
+        let tabGroup = new TabGroup({
+          newTab: {
+              title: 'New Tab'
+          }
+        });
+        tabGroup.addTab({
+            title: 'Google',
+            src: '/',
+        });
+        tabGroup.addTab({
+            title: "Electron",
+            src: "/",
+            visible: true,
+            active: true
+        });
+      }
     }
   }
 </script>
 
 <style>
-  /* CSS */
-    /* @import './test.css'; */
+  /* @import './test.css'; */
   @import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro');
 
   * {
@@ -190,5 +172,17 @@
     display: flex;
     flex-wrap: wrap;
     flex: 1;
+  }
+  /* .container-box {
+    width: 100%;
+    display: flex;
+  } */
+  .container-box {
+    width: 20%;
+    height: 6rem;
+    margin: 10px;
+    position: relative;
+    border: 1px solid #dedddd;
+    box-shadow: 0px 0px 10px #dedddd;
   }
 </style>
