@@ -1,0 +1,35 @@
+{
+  "current_tabs": [
+    "tools.Regular"
+  ],
+  "categories": {
+    "pages": {
+      "GitLab": {
+        "type": "remote",
+        "url": "https://gitlab.weibo.cn"
+      },
+      "GitHub": {
+        "type": "remote",
+        "url": "https://github.com"
+      }
+    },
+    "tools": {
+      "Regular": {
+        "type": "remote",
+        "url": "https://c.runoob.com/front-end/854"
+      },
+      "Regular2": {
+        "type": "remote",
+        "url": "https://c.runoob.com/front-end/854"
+      },
+      "Mock": {
+        "type": "remote",
+        "url": "https://mock.intra.weibo.cn"
+      },
+      "json": {
+        "type": "remote",
+        "url": "https://c.runoob.com/front-end/53"
+      }
+    }
+  }
+}

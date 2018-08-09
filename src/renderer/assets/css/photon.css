@@ -7,6 +7,15 @@
  * v0.1.2 designed by @connors.
  * =====================================================
  */
+/*
+ * 单独加的样式
+*/
+@import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro');
+.center {
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%,-50%);
+}
 
 @charset "UTF-8";
 audio,
@@ -123,7 +132,7 @@ th {
 
 * {
   cursor: default;
-  -webkit-user-select: none;
+  /* -webkit-user-select: none; */
 }
 
 input,
