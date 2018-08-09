@@ -1,7 +1,6 @@
-import { Menu, app, BrowserWindow, globalShortcut, ipcMain, dialog} from 'electron';
-const menubar = require('menubar');
-const path = require('path');
-const GhReleases = require('electron-gh-releases');
+import { Menu, app, BrowserWindow, globalShortcut, ipcMain} from 'electron'
+const menubar = require('menubar')
+const path = require('path')
 /**
  * Set `__static` path to static files in production
  * https://simulatedgreg.gitbooks.io/electron-vue/content/en/using-static-assets.html
@@ -97,8 +96,6 @@ mb.on('ready', function ready () {
   if (!ret) {
     console.log('registration failed')
   }
-
-  checkAutoUpdate(true);
 
   mb.showWindow()
 
@@ -205,70 +202,3 @@ const template = [{
       ]
     }
 ]
-function confirmAutoUpdate(updater) {
-  dialog.showMessageBox(
-    {
-      type: 'question',
-      buttons: ['Update & Restart', 'Cancel'],
-      title: 'Update Available',
-      cancelId: 99,
-      message:
-        'There is an update available. Would you like to update Gitify now?',
-    },
-    response => {
-      console.log('Exit: ' + response); // eslint-disable-line no-console
-
-      if (response === 0) {
-        updater.install();
-      }
-    }
-  );
-}
-function checkAutoUpdate(showAlert) {
-  const isDarwin = process.platform === 'darwin';
-  const isLinux = process.platform === 'linux';
-  const isWindows = process.platform === 'win32';
-
-  if (isWindows || isLinux) {
-    return;
-  }
-
-  let autoUpdateOptions = {
-    repo: 'Zoom200M/Z2DevTool',
-    currentVersion: app.getVersion(),
-  };
-
-  const updater = new GhReleases(autoUpdateOptions);
-
-  updater.on('error', (event, message) => {
-    /* eslint-disable no-console */
-    console.log('ERRORED.');
-    console.log('Event: ' + JSON.stringify(event) + '. MESSAGE: ' + message);
-    /* eslint-enable no-console */
-  });
-
-  updater.on('update-downloaded', () => {
-    // Restart the app(ask) and install the update
-    confirmAutoUpdate(updater);
-  });
-
-  // Check for updates
-  updater.check((err, status) => {
-    if (err || !status) {
-      console.log(err);
-      console.log(status);
-      if (showAlert) {
-        dialog.showMessageBox({
-          type: 'info',
-          buttons: ['Close'],
-          title: 'No update available',
-          message: 'You are currently running the latest version of Z2DevTool.',
-        });
-      }
-    }
-
-    if (!err && status) {
-      updater.download();
-    }
-  });
-}
