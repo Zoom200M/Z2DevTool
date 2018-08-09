@@ -1,6 +1,9 @@
-import { Menu, app, BrowserWindow, globalShortcut, ipcMain} from 'electron'
+import { Menu, app, BrowserWindow, globalShortcut, ipcMain, dialog } from 'electron'
 const menubar = require('menubar')
 const path = require('path')
+const superagent = require('superagent')
+const semver = require('semver')
+const config = require('./../../package.json')
 /**
  * Set `__static` path to static files in production
  * https://simulatedgreg.gitbooks.io/electron-vue/content/en/using-static-assets.html
@@ -77,7 +80,7 @@ const mb = menubar({
 })
 
 mb.on('ready', function ready () {
-  // autoUpdater()
+  autoUpdater()
 
     // ToDo: Not working anymore with electron 1.4
     // mb.window.openDevTools();
@@ -202,3 +205,36 @@ const template = [{
       ]
     }
 ]
+
+const autoUpdater = function () {
+  superagent
+      .get('https://raw.githubusercontent.com/Zoom200M/Z2DevTool/master/package.json')
+      .end(function (err, res) {
+        if (err || !res.ok) {
+          console.log(err)
+        } else {
+          try {
+            const newVersion = JSON.parse(res.text).version
+            const oldVersion = config.version
+            // console.log("new"+newVersion+res.text);
+            // console.log("old"+oldVersion);
+            if (semver.gt(newVersion, oldVersion)) {
+              const confirm = dialog.showMessageBox({
+                type: 'info',
+                message: 'A new version ' + newVersion + ' of Temps is available.',
+                detail: 'Do you want to download it now?',
+                buttons: ['Yes', 'No']
+              })
+              if (confirm === 0) {
+                shell.openExternal('https://jackd248.github.io/temps/#download')
+              }
+            }
+            else {
+              console.log("aaaaa");
+            }
+          } catch (err) {
+            console.log(err)
+          }
+        }
+      })
+}
