@@ -3,6 +3,12 @@
     "tools.Regular"
   ],
   "categories": {
+    "index": {
+      "blank": {
+        "type": "local",
+        "url": "/"
+      }
+    },
     "pages": {
       "GitLab": {
         "type": "remote",

@@ -1,47 +1,56 @@
 <template>
-  <div class="container-main">
-    <nav class="nav-group">
-      <!-- <h5 class="nav-group-title">Favorites</h5>
-      <a class="nav-group-item active" 
-        @click.stop.prevent="$router.push({ path: '/' })">
+  <div class="wrapper">
+    <div class="tab-group">
+      <div class="tab-item tab-item-fixed"
+        :class="{'cur-tag': currentClickTabIndex === -1}"
+        @click.stop.prevent="handleReturnHome">
         <span class="icon icon-home"></span>
-        connors
-      </a> -->
-      <span class="nav-group-item"
-        :class="{'cur-categories': curCategoriesIndex === index}"
-        @click="handleChangeCategorie(index)"
-        v-for="(item, index) in categories" :key="index">
-        <span class="icon icon-cloud"></span>
-        {{ item }}
-      </span>
-    </nav>
-    <div class="container-right">
-      <div class="container">
-        <div class="container-box" :key="name" v-for="(item, name) in curCategorie"
-          @click.stop.prevent="handleJump(item, name)">
-            <div class="box">
-              <div class="center">
-                <p class="page-title">{{ name }}</p>
-              </div>
-              <p class="page-url" @click.stop.prevent>{{ item.url }}</p>
-            </div>
-        </div>
+      </div>
+      <div class="tab-item" :key="index" v-for="(item, index) in currentTabs"
+        :class="{'cur-tag': currentClickTabIndex === index}"
+        @click="handleJumpPage(item, index)">
+        {{ item.indexOf('.') > -1 ? item.split('.')[1] : item }}
+        <span class="icon icon-cancel icon-close-tab" @click.stop.prevent="deleteTable(index)"></span>
+      </div>
+      <div class="tab-item tab-item-fixed" @click="addTable">
+        <span class="icon icon-plus"></span>
+      </div>
+      <div class="tab-item tab-item-fixed" @click="popupAppMenu">
+        <span class="icon icon-menu"></span>
       </div>
     </div>
+    <main>
+      <system-information></system-information>
+    </main>
+    <!-- <webview id="foo" src="https://www.github.com/" style="display:inline-block; width:1240px; height:480px"></webview> -->
   </div>
-  <!-- <webview id="foo" src="https://www.github.com/" style="display:inline-block; width:1240px; height:480px"></webview> -->
 </template>
 
 <script>
+  import { remote } from 'electron';
+  import TabGroup from 'electron-tabs';
   import Store from 'electron-store';
+  // import { constants } from 'http2';
+  import SystemInformation from './LandingPage/SystemInformation'
+
   export default {
     name: 'landing-page',
+    components: { SystemInformation },
     data() {
       return {
+        currentTabs: [],
         categories: [],
-        curCategorie: {},
-        curCategoriesIndex: 0,
+        currentClickTabIndex: -1,
         categoriesList: {},
+        store: null,
+        tabList: [
+          'tab1',
+          'tab2',
+          'tab3',
+          'tab1',
+          'tab2',
+          'tab3'            
+        ],
         menuTemplate: [
           { label: '设置', accelerator: 'Command+,', selector: 'orderFrontStandardAboutPanel:' },
           { type: 'separator' },
@@ -49,125 +58,81 @@
           { type: 'separator' },
           { label: '退出', accelerator: 'Command+Q', click: () => { remote.app.quit(); } }
         ],
+        curTab: '',
       };
-    },    
-    created() {
-      this.getInitialData();
     },
-    mounted() {
-      // this.getGroup();
+    watch: {
+    },
+    created() {
+      this.store = new Store();
+      this.getInitialData();
     },
     methods: {
       getInitialData() {
-        const store = new Store();
-        const categoriesStore = store.get('categories');
-        this.categoriesList = categoriesStore;
-        for (let i in categoriesStore) {
+        const current_tabs = this.store.get('current_tabs');
+        this.currentTabs = current_tabs ? current_tabs : [];
+        console.log('currentTabs', this.currentTabs);
+        this.categoriesList = this.store.get('categories');
+        for (let i in this.categoriesList) {
           this.categories.push(i);
         }
-        this.curCategorie = this.categoriesList[this.categories[0]];
       },
-      handleChangeCategorie(index) {
-        this.curCategoriesIndex = index;
-        this.curCategorie = this.categoriesList[this.categories[index]];
+      deleteTable(index) {
+        this.currentTabs.splice(index, 1);
+        this.store.set('current_tabs', this.currentTabs);
       },
-      open(link) {
-        this.$electron.shell.openExternal(link)
+      popupAppMenu() {
+        const menu = remote.Menu.buildFromTemplate(this.menuTemplate);
+        menu.popup();
       },
-      handleJump(item, name) {
-        if (this.$route.query.type) {
-          this.$router.push({
-            name: 'container-info',
-            query: {
-              url: item.url,
-              index: this.$route.query.index - 1,
-              updateIndex: this.$route.query.index - 1,
-              categories: `${this.categories[this.curCategoriesIndex]}.${name}`
-            }
-          });          
-        } else {
-          this.$router.push({
-            name: 'container-info',
-            query: {
-              url: item.url
-            }
-          });
-        }
+      addTable() {
+        this.currentTabs.push('index.blank');     
+        this.store.set("current_tabs", this.currentTabs);
+        this.currentClickTabIndex = this.currentTabs.length -1;
+      },
+      handleReturnHome() {
+        this.currentClickTabIndex = -1;
+      },
+      handleJumpPage(item, index) {
+        this.currentClickTabIndex = index;
       }
     }
   }
 </script>
 
 <style>
-  @import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro');
-  /* .container-box {
+  /* CSS */
+    /* @import './test.css'; */
+  #wrapper {
+    background:
+      radial-gradient(
+        ellipse at top left,
+        rgba(255, 255, 255, 1) 40%,
+        rgba(229, 229, 229, .9) 100%
+      );
+    height: 100vh;
+    /* padding: 60px 80px; */
+    width: 100vw;
+  }
+
+  #logo {
+    height: auto;
+    margin-bottom: 20px;
+    width: 420px;
+  }
+  #app {
     width: 100%;
+    height: 100%;
+    background: #fff;
+  }
+  main {
     display: flex;
-  } */
-  .nav-group {
-    width: 16%;
-    display: inline-block;
-    margin-top: 2rem;
-  }
-  .cur-categories {
-    background: #8c8c8c!important;
-  }
-  .container-main {
+    justify-content: space-between;
     width: 100%;
+    height: 90%;
   }
-  /*
-  * 中间内容区域样式
-  */
-  .container {
-    width: 100%;
-    margin: 0 auto;
-    display: flex;
-    flex-wrap: wrap;
-    flex: 1;
+  .cur-tag {
+    background: #e2e2e2;
   }
-  .container-box {
-    width: 13%;
-    padding: 13%;
-    margin: 1rem;
-    position: relative;
-    border: 1px solid #dedddd;
-    box-shadow: 0.1rem 0 0.4rem #717171;
-  }
-  .container-box .box {
-    position: absolute;
-    overflow: hidden;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%,-50%);
-    /* position: absolute; */
-    width: 80%;
-    height: 60%;
-    text-align: center;
-    background: #464242;
-    color: #fff;
-  }
-  .container-box .box div {
-    position: relative;
-  }
-  .container-box .page-title {
-    font-size: 1.6rem;
-  }
-  .container-box .page-url {
-    word-wrap: break-word;
-    margin-top: 28%;
-    color: #dfdeff;
-    font-size: 0.7rem;
-  }
-  .nav-group-item {
-    background: #f5f5f5;
-    border-bottom: 1px solid #c3c3c3;
-    box-shadow: 1px 1px #d4cfcf;
-    padding: 2px 10px 2px 25px;
-    margin-bottom: 0.8rem;
-  }
-  .container-right {
-    display: inline-block;
-    width: 80%;
-    float: right;
-  }
+  /* main > div { flex-basis: 50%; } */
 </style>
