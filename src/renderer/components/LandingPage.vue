@@ -1,15 +1,15 @@
 <template>
   <div class="wrapper">
     <div class="tab-group">
-      <div class="tab-item tab-item-fixed"
-        :class="{'cur-tag': currentClickTabIndex === -1}"
+      <!-- <div class="tab-item tab-item-fixed"
+        :class="{'cur-tag': currentTabIndex === -1}"
         @click.stop.prevent="handleReturnHome">
         <span class="icon icon-home"></span>
-      </div>
+      </div> -->
       <div class="tab-item" :key="index" v-for="(item, index) in currentTabs"
-        :class="{'cur-tag': currentClickTabIndex === index}"
+        :class="{'cur-tag': currentTabIndex === index}"
         @click="handleJumpPage(item, index)">
-        {{ item.indexOf('.') > -1 ? item.split('.')[1] : item }}
+        {{ item.name }}
         <span class="icon icon-cancel icon-close-tab" @click.stop.prevent="deleteTable(index)"></span>
       </div>
       <div class="tab-item tab-item-fixed" @click="addTable">
@@ -20,7 +20,11 @@
       </div>
     </div>
     <main>
-      <system-information></system-information>
+      <system-information
+        @changeTabs="changeTabs"
+        :currentTabs="currentTabs" 
+        :currentTabIndex="currentTabIndex">
+      </system-information>
     </main>
     <!-- <webview id="foo" src="https://www.github.com/" style="display:inline-block; width:1240px; height:480px"></webview> -->
   </div>
@@ -40,7 +44,7 @@
       return {
         currentTabs: [],
         categories: [],
-        currentClickTabIndex: -1,
+        currentTabIndex: -1,
         categoriesList: {},
         store: null,
         tabList: [
@@ -68,11 +72,22 @@
       this.getInitialData();
     },
     methods: {
+      changeTabs(index, tabs) {
+        this.currentTabs = tabs;
+        console.log('tabs906',  typeof(tabs));
+        this.$set(this.currentTabs, index, this.currentTabs[index]);
+        this.store.set("current_tabs", this.currentTabs);
+      },
       getInitialData() {
         const current_tabs = this.store.get('current_tabs');
+        console.log('ss', current_tabs);
         this.currentTabs = current_tabs ? current_tabs : [];
+        if (this.currentTabs.length === 0) {
+          this.addTable();
+        }
         console.log('currentTabs', this.currentTabs);
         this.categoriesList = this.store.get('categories');
+        console.log('666categoriesList', this.categoriesList);
         for (let i in this.categoriesList) {
           this.categories.push(i);
         }
@@ -86,15 +101,22 @@
         menu.popup();
       },
       addTable() {
-        this.currentTabs.push('index.blank');     
+        this.currentTabs.push({
+          name: 'blank',
+          url: '/',
+          type: 'local'
+        });     
         this.store.set("current_tabs", this.currentTabs);
-        this.currentClickTabIndex = this.currentTabs.length -1;
+        this.currentTabIndex = this.currentTabs.length -1;
       },
       handleReturnHome() {
-        this.currentClickTabIndex = -1;
+        console.log('store', this.currentTabs);
+        this.currentTabIndex = -1;
+        this.currentTabIndex = this.currentTabs.length -1;
       },
       handleJumpPage(item, index) {
-        this.currentClickTabIndex = index;
+        this.currentTabIndex = index;
+        console.log('item', item);
       }
     }
   }

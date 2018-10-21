@@ -9,6 +9,7 @@
 <script>
   import { remote } from 'electron';
   import TabGroup from 'electron-tabs';
+  import Store from 'electron-store';
   export default {
     name: 'container-info',
     // components: { SystemInformation },
