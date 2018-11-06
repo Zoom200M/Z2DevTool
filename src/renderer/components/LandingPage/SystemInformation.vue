@@ -14,9 +14,10 @@
         <span class="icon icon-cloud"></span>
         {{ item }}
       </span>
+      <span @click="updateSettingInfo">修改配置文件</span>
     </nav>
-    <div class="container-right">
-      <div class="container" v-if="!isTabInfo">
+    <div :class="[isTabInfo ? 'container-right-webview' : 'container-right']">
+      <div class="container" v-show="!isTabInfo">
         <div class="container-box" :key="name" v-for="(item, name) in curCategorie"
           @click.stop.prevent="openTab(item, name)">
             <a class="box-title">
@@ -28,10 +29,6 @@
               </div>
             </a>
             <button @click.stop.prevent="changeInfo(item, name)" class="box-menu box-edit-menu" title="修改快捷方式" aria-label="修改快捷方式 百度一下，你就知道"></button>
-            <!-- <div class="box center">
-              <p class="page-title">{{ name }}</p>
-            </div>
-            <p class="page-url" @click.stop.prevent>{{ item.url }}</p> -->
         </div>
         <div class="container-box">
             <a class="box-title"  @click.stop.prevent="addShortcut">
@@ -44,8 +41,8 @@
             </a>
         </div>
       </div>
-      <div class="container webview-container" v-else>
-        <webview :src="pageUrl" httpreferrer="http://cheng.guru"></webview>
+      <div class="container webview-container" v-show="isTabInfo">
+        <webview v-for="(item, index) in currentTabs" v-show="pageUrl === item.url" :key="index" :src="item.url" httpreferrer="http://cheng.guru"></webview>
         <!-- <webview id="foo" src="https://www.baidu.com/" style="display:inline-block; width:1240px; height:100px"></webview> -->
       </div>
       <dialog v-show="showDialog" class="edit-link-dialog" open="">
@@ -65,11 +62,33 @@
               <div class="underline"></div>
             </div>
           </div>
+          <div id="url" class="field-container">
+            <label id="url-field-name" class="field-title">网址类型</label>
+            <div class="input-container">
+              <select v-model="info.type">
+                <option>remote</option>
+                <option>local</option>
+              </select>
+            </div>
+          </div>
           <div class="buttons-container">
-            <button id="delete" class="secondary" type="button" tabindex="0" title="删除">删除</button>
+            <button id="delete" @click="deleteInfo" class="secondary" type="button" tabindex="0" title="删除">删除</button>
             <span class="right">
               <button @click="changeInfo" class="cancel secondary" type="button" tabindex="0" title="取消">取消</button>
-              <button type="submit" id="done" class="primary" tabindex="0" title="修改快捷方式">完成</button>
+              <button type="submit" id="done" class="primary" tabindex="0" title="修改快捷方式" @click="updateInfo">完成</button>
+            </span>
+          </div>
+        </form>
+      </dialog>
+      <dialog v-show="showConfigurationDialog" class="edit-link-dialog" open="">
+        <div class="dialog-title">修改配置文件</div>
+        <form action="">
+          <textarea v-model="settingInfo" rows="3" cols="20">
+          </textarea>
+          <div class="buttons-container">
+            <span class="right">
+              <button @click="showConfigurationDialog=false" class="cancel secondary" type="button" tabindex="0" title="取消">取消</button>
+              <button type="submit" id="done" class="primary" tabindex="0" title="修改快捷方式" @click="updateInfo">完成</button>
             </span>
           </div>
         </form>
@@ -92,6 +111,7 @@
     },
     data() {
       return {
+        store: null,
         categories: [],
         curCategorie: {},
         curCategoriesIndex: 0,
@@ -108,8 +128,12 @@
         showDialog: false,
         info: {
           name: '',
-          url: ''
-        }
+          url: '',
+          type: ''
+        },
+        name: false,
+        showConfigurationDialog: false,
+        settingInfo: {}
       };
     },    
     created() {
@@ -132,17 +156,43 @@
       changeInfo(item, name) {
         this.info.url = item.url;
         this.info.name = name;
+        this.info.type = item.type;
+        this.name = name;
+        this.showDialog = !this.showDialog;
+      },
+      updateSettingInfo() {
+        this.showConfigurationDialog = true;
+        this.settingInfo = JSON.stringify(this.store.get('categories'));
+      },
+      deleteInfo() {
+        delete this.categoriesList[this.categories[this.curCategoriesIndex]][this.info.name];
+        this.store.set('categories', this.categoriesList);
+        this.showDialog = !this.showDialog;
+      },
+      updateInfo() {
+        if (this.name && (this.name !== this.info.name)) {
+          delete this.categoriesList[this.categories[this.curCategoriesIndex]][this.name];
+        }
+        this.categoriesList[this.categories[this.curCategoriesIndex]][this.info.name] = {
+          type: this.info.type,
+          url: this.info.url
+        }
+        this.store.set('categories', this.categoriesList);
         this.showDialog = !this.showDialog;
       },
       addShortcut() {
         this.showDialog = !this.showDialog;
       },
       getInitialData() {
-        const store = new Store();
-        const categoriesStore = store.get('categories');
+        this.store = new Store();
+        const categoriesStore = this.store.get('categories');
         this.categoriesList = categoriesStore;
+        console.log('dd', categoriesStore);
         for (let i in categoriesStore) {
-          this.categories.push(i);
+          console.log('222e', categoriesStore[i])
+          if (categoriesStore[i] !=='') {
+            this.categories.push(i);
+          }
         }
         this.curCategorie = this.categoriesList[this.categories[0]];
       },
@@ -337,6 +387,10 @@
     color: #dfdeff;
     font-size: 0.7rem;
   } */
+  .container-right-webview {
+    width: 100%;
+    height: 100%;
+  }
   .container-right {
     display: inline-block;
     width: 80%;
@@ -355,6 +409,7 @@
   }
   .webview-container {
     width: 100%;
+    height: 100%;
   }
   /* 弹框 */
   dialog {

@@ -26,7 +26,6 @@
         :currentTabIndex="currentTabIndex">
       </system-information>
     </main>
-    <!-- <webview id="foo" src="https://www.github.com/" style="display:inline-block; width:1240px; height:480px"></webview> -->
   </div>
 </template>
 
@@ -74,20 +73,16 @@
     methods: {
       changeTabs(index, tabs) {
         this.currentTabs = tabs;
-        console.log('tabs906',  typeof(tabs));
         this.$set(this.currentTabs, index, this.currentTabs[index]);
         this.store.set("current_tabs", this.currentTabs);
       },
       getInitialData() {
         const current_tabs = this.store.get('current_tabs');
-        console.log('ss', current_tabs);
         this.currentTabs = current_tabs ? current_tabs : [];
-        if (this.currentTabs.length === 0) {
+        if (this.currentTabs.length === 0) { // 当没有tab的时候，就默认显示新增tab
           this.addTable();
         }
-        console.log('currentTabs', this.currentTabs);
         this.categoriesList = this.store.get('categories');
-        console.log('666categoriesList', this.categoriesList);
         for (let i in this.categoriesList) {
           this.categories.push(i);
         }
@@ -110,42 +105,20 @@
         this.currentTabIndex = this.currentTabs.length -1;
       },
       handleReturnHome() {
-        console.log('store', this.currentTabs);
         this.currentTabIndex = -1;
         this.currentTabIndex = this.currentTabs.length -1;
       },
       handleJumpPage(item, index) {
         this.currentTabIndex = index;
-        console.log('item', item);
       }
     }
   }
 </script>
 
 <style>
-  /* CSS */
-    /* @import './test.css'; */
-  #wrapper {
-    background:
-      radial-gradient(
-        ellipse at top left,
-        rgba(255, 255, 255, 1) 40%,
-        rgba(229, 229, 229, .9) 100%
-      );
-    height: 100vh;
-    /* padding: 60px 80px; */
-    width: 100vw;
-  }
-
-  #logo {
-    height: auto;
-    margin-bottom: 20px;
-    width: 420px;
-  }
-  #app {
+  .wrapper {
     width: 100%;
     height: 100%;
-    background: #fff;
   }
   main {
     display: flex;
